@@ -1,0 +1,98 @@
+```{r echo=TRUE}
+## Sreya Dhar
+## Practical Machine Learning: Final Project
+
+rm(list = ls());
+
+#load libraries
+library(caret)
+library(rpart)
+library(rpart.plot)
+library(RColorBrewer)
+library(rattle)
+library(e1071)
+library(randomForest)
+library(readr)
+library(party)					# Alternative decision tree algorithm
+library(partykit)				# Convert rpart object to BinaryTree
+
+
+# set the seed
+set.seed(100)
+
+# the url of the files incase you want to read them online 
+train.url <-
+  "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+test.url <- 
+  "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+
+# read the csv files (saved in hard drive)
+train_orig <- read.csv("C:/File E/Regresion analysis/pml-training.csv", header=T)
+test_orig <- read.csv("C:/File E/Regresion analysis/pml-testing.csv", header=T)
+
+
+# Drop the first 7 columns as they're unnecessary for predicting.
+train_clean <- train_orig[,8:length(colnames(train_orig))]
+test_clean <- test_orig[,8:length(colnames(test_orig))]
+
+# Drop colums with NAs
+train_clean <- train_clean[, colSums(is.na(train_clean)) == 0] 
+test_clean <- test_clean[, colSums(is.na(test_clean)) == 0] 
+
+# Check for near zero variance predictors and drop them if necessary
+nzv <- nearZeroVar(train_clean,saveMetrics=TRUE)
+zero.var.ind <- sum(nzv$nzv)
+
+# 
+if ((zero.var.ind>=0)) {
+  train_clean <- train_clean[,nzv$nzv==FALSE]
+}
+
+# data partitioning in training set (80%) and validation set (20%) 
+train_part <- createDataPartition(train_clean$classe, p=0.80, list=F)
+train_final <- train_clean[train_part, ]
+validate_final <- train_clean[-train_part, ]
+
+# 5-fold cross-validation performed on Random Forest algorithm
+controlPara <- trainControl(method="cv", 5)
+
+# Random Forest for training data set, 300 trees performed 
+mod_rf <- train(classe ~ ., data=train_final, method="rf",
+                  trControl=controlPara, ntree=300)
+# model summary
+mod_rf
+
+```
+```{r}
+# predict the trained model on validation set
+pred_rf <- predict(mod_rf, validate_final)
+
+# confusion matrix on validation set
+confusionMatrix(validate_final$classe, pred_rf)
+
+```
+```{r}
+# accuracy of the predicted model
+accuracy <- postResample(pred_rf, validate_final$classe)
+accu_out <- accuracy[1]
+accu_out
+```
+```{r}
+# Overall out of sample error:
+OSE <- 1 - as.numeric(confusionMatrix(validate_final$classe, pred_rf)
+                 $overall[1])
+OSE
+```
+```{r}
+# trained model applied to test data for results
+pred_test <- predict(mod_rf, test_clean[, -length(names(test_clean))])
+pred_test
+```
+```{r}
+# Building the regression tree
+mytree <- rpart(classe ~ ., data=train_final, method="class")
+
+# Plot the tree 
+fancyRpartPlot(mytree, caption = 'https://github.com/sreyadhar') +
+title('Regression Tree Visualization',adj = 0.0)
+```
