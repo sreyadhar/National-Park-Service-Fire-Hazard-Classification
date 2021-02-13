@@ -11,3 +11,19 @@ https://data-nifc.opendata.arcgis.com/datasets/facility?geometry=50.977%2C-89.99
 (last accessed on 10 Oct 2020). An overview of the dataset has been given in table 1.
 •	We divided the dataset into nine different tables in the SQL database. 
 
+PROPOSED ANALYSIS:
+•	Performing EDA (.ipynb notebook)
+•	Data Cleaning
+•	Suitable Data Imputation
+•	Dividing the data into train and test sets
+•	Feature importance analysis
+•	ML algorithms
+•	Summary	CONCLUSION:
+●	Ensemble methods like random Forest and XGBoost are performing well in predicting ‘Rating’ variable against Wild Fire hazards!
+●	Sigmoid kernel from SVM is not performing in a desirable manner.
+●	Suitable ML algorithms would be depending on dataset. No Hands-on rule!!
+
+CONCLUSION:
+●	Ensemble methods like random Forest and XGBoost are performing well in predicting ‘Rating’ variable against Wild Fire hazards!
+●	Sigmoid kernel from SVM is not performing in a desirable manner.
+●	Suitable ML algorithms would be depending on dataset. No Hands-on rule!!
